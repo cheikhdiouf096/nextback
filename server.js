@@ -14,6 +14,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.get("/", (req, res) => {
+    res.send("Hello from Node API Server Updated");
+});
+
+
 //create hotels
 const hotelRoutes = require("./routes/post.routes");
 app.use("/api/hotels", hotelRoutes);

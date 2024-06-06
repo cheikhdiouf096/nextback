@@ -18,6 +18,20 @@ const registerUser = async (req, res) => {
   }
 };
 
+
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+
+  console.log("je dois recuprer les users ici"); 
+};
+
+
 const getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -32,7 +46,22 @@ const getUserById = async (req, res) => {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: "An error occurred while fetching the user." });
   }
-}; 
+};
+
+
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 const loginUser = async (req, res) => {
@@ -40,6 +69,8 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
+
+    console.log(user);
     
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -62,6 +93,35 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: "An error occurred while logging in the user." });
   }
 };
+
+// const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+
+//     if (!user) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     // Vérification du mot de passe
+//     const passwordsMatch = await bcrypt.compare(password, user.password);
+//     if (!passwordsMatch) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+  
+//     return res.status(200).json({ 
+//       id: user._id,
+//       email: user.email,
+//       name: user.fullName
+//     });
+
+//   } catch (error) {
+//     console.error("Error logging in user:", error);
+//     res.status(500).json({ message: "An error occurred while logging in the user." });
+//   }
+// };
 
 
 function sendResetPasswordEmail(user, token) {
@@ -149,6 +209,8 @@ const resetPassword = async (req, res) => {
 module.exports = {
   registerUser,
   getUserById,
+  getUsers,
+  deleteUser,
   loginUser,
   forgotPassword,
   resetPassword,
